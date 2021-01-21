@@ -1,7 +1,8 @@
 window
 {
-    background-image: url("../img/css-fon.png");
+    background-image: url("../img/css-fon2.jpg");
     background-repeat: no-repeat;
+    background-size: 1280px;
 
 }
 
@@ -14,5 +15,14 @@ window
 
 #authorization
 {
-    background-color: azure;
+    background-image: url("../img/tenor.gif");
+    background-size: 500px;
+    padding: 5px;
+    border-radius: 15px;
+    border: .5px solid #e1e1e1;
+}
+
+#Reg
+{
+    background-image: url("../img/tenor.gif");
 }

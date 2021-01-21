@@ -29,4 +29,21 @@ void Connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen);
 
 void Inet_pton(int af, const char *src, void *dst);
 
+// Log in/Registration menu
+//==========================================================================================
+
+    GtkWidget *window;
+    GtkWidget *maintitle;
+    GtkWidget *enter_button, *reg_button;
+    GtkWidget *titlebox, *loginbox, *mainbox, *passbox, *enterbox, *reg_menu;
+    GtkWidget *login_entry, *pass_entry;
+
+    GtkCssProvider *provider;
+    GdkDisplay *display;
+    GdkScreen *screen;
+    GError *error = 0;
+//==========================================================================================
+static void authorization(GtkWidget *widget, GdkEvent *event, gpointer *data);
+
+
 #endif
