@@ -1,0 +1,18 @@
+window
+{
+    background-image: url("../img/css-fon.png");
+    background-repeat: no-repeat;
+
+}
+
+#chat_name
+{
+    color: aqua;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 32pt;
+}
+
+#authorization
+{
+    background-color: azure;
+}
