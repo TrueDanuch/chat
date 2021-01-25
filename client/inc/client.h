@@ -26,7 +26,7 @@ void mx_widget_switch_visibility(GtkWidget *usr_ctrl, GtkWidget *widget);
 void mx_widget_set_visibility(GtkWidget *widget, gboolean is_visible);
 */
 
-//#define MX_GUI_PATH "../src/gui.glade"
+#define MX_GUI_PATH "src/gui.glade"
 
 
 int mx_atoi(const char *str);

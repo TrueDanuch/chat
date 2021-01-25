@@ -278,18 +278,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkButton" id="btn_filechooser_open">
-                <property name="label" translatable="yes">Open</property>
-                <property name="visible">True</property>
-                <property name="can-focus">False</property>
-                <property name="receives-default">True</property>
-                <signal name="clicked" handler="mx_widget_switch_visibility" object="filechooser" swapped="no"/>
-              </object>
-              <packing>
-                <property name="expand">True</property>
-                <property name="fill">True</property>
-                <property name="position">1</property>
-              </packing>
+              <placeholder/>
             </child>
           </object>
           <packing>

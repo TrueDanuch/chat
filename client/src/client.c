@@ -57,55 +57,26 @@ void mx_widget_switch_visibility(GtkWidget *usr_ctrl, GtkWidget *widget) {
 }
 */
 
-static GtkWidget*
-create_window (void)
-{
-        /* это виджет окна */
-        GtkWidget *window;
-        /* это тот волшебный объект, который сделает за нас окошко */
-        GtkBuilder *builder;
-        /* сюда будем складывать ошибки */
-        GError* error = NULL;
-
-        /* тут загружаем файл с интерфейсом */
-        builder = gtk_builder_new ();
-        if (!gtk_builder_add_from_file (builder, "gui.glade", &error))
-        {
-                /* загрузить файл не удалось */
-                g_critical ("Не могу загрузить файл: %s", error->message);
-                g_error_free (error);
-        }
-
-        /* помните, мы подключали сигналы вручную? теперь это происходит автоматически! */
-        gtk_builder_connect_signals (builder, NULL);
-
-        /* получаем виджет окна, чтобы его показать */
-        window = GTK_WIDGET (gtk_builder_get_object (builder, "window"));
-        if (!window)
-        {
-                /* что-то не так, наверное, ошиблись в имени */
-                g_critical ("Ошибка при получении виджета окна");
-        }
-        g_object_unref (builder);
-
-        return window;
-}
-
 
 int main(int adc, char* adv[]) {
-    //t_chat *chat = NULL;
-    //mx_start_main_window(chat);
-    /* виджет окна */
+
+    GtkBuilder *builder;
     GtkWidget *window;
 
-    /* запускаем GTK+ */
     gtk_init (NULL, NULL);
+    GError *err = NULL;
 
-    /* вызываем нашу функцию для создания окна */
-    window = create_window ();
-    gtk_widget_show (window);
+    builder = gtk_builder_new();
+    if(0 == gtk_builder_add_from_file(builder, MX_GUI_PATH, &err))
+    {
+        fprintf(stderr, "Error adding build from file. Error: %s\n", err->message);
+    }
 
-    /* передаём управление GTK+ */
+    window = GTK_WIDGET(gtk_builder_get_object(builder, "filechooser"));
+    gtk_builder_connect_signals(builder, NULL);
+    g_object_unref(builder);
+
+    gtk_widget_show(window);
     gtk_main ();
 
     adc = 1;
