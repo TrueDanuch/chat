@@ -1,24 +1,42 @@
 #include "client.h"
 
+//--------------------------------------------------------------------------------------------------
+//------------------------------------------   Connection ------------------------------------------
+//--------------------------------------------------------------------------------------------------
+
 void* Write(void* FD) {
-    int fd = *(int *) FD;
+    int fld = *(int *) FD;
+    fld = 1;
+    char chatname[32] = "Andrew__________Dangeonmaster___";
+    
+
     char buf[1024];
     int n;
+
     while(1) {
         bzero(buf, sizeof(buf));
         n = 0;
+
         while((buf[n++] = getchar()) != '\n');
+
+        if (buf[0] == '!')
+            SendMesage(chatname, buf);
+        else 
         send(fd, buf, sizeof(buf), 0);
+
         pthread_testcancel();
     }
+    
     pthread_exit(NULL);
 }
+
 void* Read(void* FD) {
     int fd = * (int *) FD;
     char buf[1024];
     while(1) {
         if (recv(fd, buf, 1024, 0) > 0) {
-            printf("Read: %s", buf);
+            printf("Reag: %s\n", buf);
+            Decrypt(buf, fd);
             bzero(buf, sizeof(buf));
         }
         else {
@@ -29,59 +47,135 @@ void* Read(void* FD) {
     pthread_exit(NULL);
 }
 
-/*
-GtkBuilder *mx_init_window(gint argc, char **argv) {
-    GtkBuilder *builder;
+//--------------------------------------------------------------------------------------------------
+//------------------------------------------   Load CSS  -------------------------------------------
+//--------------------------------------------------------------------------------------------------
 
-    gtk_init(&argc, &argv);
+static void load_css(void)//   Connecting CSS file
+{
+    const gchar *css_style_file = "../client/css/theme.css";
+
+    provider = gtk_css_provider_new();
+    display = gdk_display_get_default();
+    screen = gdk_display_get_default_screen(display);
+
+    gtk_style_context_add_provider_for_screen(screen, GTK_STYLE_PROVIDER(provider), GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+    gtk_css_provider_load_from_path(provider, css_style_file, NULL);
+
+    g_object_unref(provider);
+}
+
+//--------------------------------------------------------------------------------------------------
+//-------------------------------   Connect glade and create window   ------------------------------
+//--------------------------------------------------------------------------------------------------
+
+static GtkWidget* create_window (void)
+{
+    GError* error = NULL;
+
     builder = gtk_builder_new();
-    gtk_builder_connect_signals(builder, builder);
-    return builder;
+    if (!gtk_builder_add_from_file (builder, MX_GUI_PATH, &error))
+    {
+             g_critical ("Не могу загрузить файл: %s", error->message);
+             g_error_free (error);
+    }
+    gtk_builder_connect_signals (builder, builder);
+    
+    wnd_main = GTK_WIDGET (gtk_builder_get_object (builder, "wnd_main"));
+    dialog_auth = GTK_WIDGET(gtk_builder_get_object(builder, "dialog_auth"));
+    g_object_unref (builder);
+    gtk_widget_hide(wnd_main);
+
+    
+    if (!dialog_auth)
+    {
+            g_critical ("Ошибка при получении виджета окна");
+    }
+    
+    if (!wnd_main)
+    {
+            g_critical ("Ошибка при получении виджета окна");
+    }
+
+    return dialog_auth;
 }
 
-void mx_start_main_window(t_chat *chat) {
-    GObject *wnd_main = gtk_builder_get_object(chat->builder, "wnd_main");
-    GObject *dialog_auth = gtk_builder_get_object(chat->builder, "dialog_auth");
-    mx_widget_switch_visibility(NULL, GTK_WIDGET(dialog_auth));
-    mx_widget_switch_visibility(NULL, GTK_WIDGET(wnd_main));
+//--------------------------------------------------------------------------------------------------
+//-----------------------------------------   Events   ---------------------------------------------
+//--------------------------------------------------------------------------------------------------
+
+gboolean my_delete_event()
+{
+    write(fd, "quit", strlen("quit"));
+    pthread_join(rd, NULL);
+    pthread_cancel(wr);
+    close(fd);
+    gtk_main_quit();
+    printf("Programm closed\n");
+    return FALSE;
 }
-void mx_widget_set_visibility(GtkWidget *widget, gboolean is_visible) {
-    if (is_visible)
-        gtk_widget_show(widget);
-    else
-        gtk_widget_hide(widget);    
-}
-void mx_widget_switch_visibility(GtkWidget *usr_ctrl, GtkWidget *widget) {
-    mx_widget_set_visibility(widget, !gtk_widget_is_visible(widget));
-    (void)usr_ctrl;
+
+/*
+void mx_reset_addroom(GtkButton *btn, GtkBuilder *builder) 
+{
+    mx_clear_buffer_text("buffer_roomname", builder);
+    (void)btn;
 }
 */
 
+/*
+void mx_hide_msg_editing(GtkButton *btn, GtkBuilder *builder) 
+{
+    GObject *box_editing = gtk_builder_get_object(builder, "box_editing_msg");
+    GObject *btn_apply = gtk_builder_get_object(builder, "btn_edit_msg_apply");
+    GObject *btn_send = gtk_builder_get_object(builder, "btn_send_msg");
 
-int main(int adc, char* adv[]) {
+    gtk_widget_hide(GTK_WIDGET(box_editing));
+    gtk_widget_hide(GTK_WIDGET(btn_apply));
+    gtk_widget_show(GTK_WIDGET(btn_send));;
+    mx_clear_buffer_text("buffer_message", builder);
+    (void)btn;
+}
+*/
 
-    GtkBuilder *builder;
-    GtkWidget *window;
+/*
+void mx_switch_to_msg_ctrl(GtkButton *btn, GtkBuilder *builder) 
+{
+    mx_switch_room_header(builder, MX_MSG_CTRL);
+    (void)btn;
+}
+*/
+
+/*
+void mx_set_unsensetive_confirm(GtkEntryBuffer *buff, guint pos, guint n_chars, GtkEntry *entry) 
+{
+    char *buffer = (char*)gtk_entry_buffer_get_text(buff);
+
+    if (strlen(buffer) == 0)
+        gtk_widget_set_sensitive(GTK_WIDGET(entry), 0);
+    (void)buff;
+    (void)pos;
+    (void)n_chars;
+}
+*/
+
+//--------------------------------------------------------------------------------------------------
+//-------------------------------------   Main Function   ------------------------------------------
+//--------------------------------------------------------------------------------------------------
+
+int main(int adc, char* adv[]) 
+{
 
     gtk_init (NULL, NULL);
-    GError *err = NULL;
+    load_css();
+    window = create_window ();
+    //g_signal_connect(window, "destroy", G_CALLBACK(my_delete_event), NULL);
+    gtk_widget_show_all(window);
 
-    builder = gtk_builder_new();
-    if(0 == gtk_builder_add_from_file(builder, MX_GUI_PATH, &err))
-    {
-        fprintf(stderr, "Error adding build from file. Error: %s\n", err->message);
-    }
-
-    window = GTK_WIDGET(gtk_builder_get_object(builder, "filechooser"));
-    gtk_builder_connect_signals(builder, NULL);
-    g_object_unref(builder);
-
-    gtk_widget_show(window);
-    gtk_main ();
-
+    DataBase();
+    strncat(logname, "Andrew          ", 16);
     adc = 1;
-    pthread_t rd, wr;
-    int fd = Socket(AF_INET, SOCK_STREAM, 0);
+    fd = Socket(AF_INET, SOCK_STREAM, 0);
     struct sockaddr_in adr;
     adr.sin_family = AF_INET;
     adr.sin_port = htons(atoi(adv[2]));
@@ -92,8 +186,7 @@ int main(int adc, char* adv[]) {
     printf("Server: %s",buf);
     pthread_create(&rd, NULL, Read, &fd);
     pthread_create(&wr, NULL, Write, &fd);
-    pthread_join(rd, NULL);
-    pthread_cancel(wr);
-    close(fd);
+    gtk_main ();
+    
     return 0;
 }

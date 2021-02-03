@@ -1,16 +1,25 @@
- #include "server.h"
+#include "server.h"
      
 int main(int adc, char* adv[])   
-{   
+{
+    DataBase();
+    
+    
     adc = 1;
-    PORT = atoi(adv[2]);
+    int PORT = atoi(adv[2]);
     int opt = TRUE;   
-    int master_socket , addrlen , new_socket , client_socket[30] ,  
-          max_clients = 30 , activity, i , valread , sd;   
+    int master_socket , addrlen , new_socket,  
+        max_clients = 30 , activity, i , valread , sd;   
     int max_sd;   
-    struct sockaddr_in address;   
+    //int result;
+    //pthread_t thread1;  
          
-    char buffer[1025];  //data buffer of 1K  
+    char buffer[1024];  //data buffer of 1K  
+    
+    //type of socket created  
+    address.sin_family = AF_INET;   
+    address.sin_addr.s_addr = inet_addr(adv[1]);   
+    address.sin_port = htons( PORT );  
          
     //set of socket descriptors  
     fd_set readfds;   
@@ -39,11 +48,6 @@ int main(int adc, char* adv[])
         perror("setsockopt");   
         exit(EXIT_FAILURE);   
     }   
-     
-    //type of socket created  
-    address.sin_family = AF_INET;   
-    address.sin_addr.s_addr = inet_addr(adv[1]);   
-    address.sin_port = htons( PORT );   
          
     //bind the socket to localhost port 8888  
     if (bind(master_socket, (struct sockaddr *)&address, sizeof(address))<0)   
@@ -66,6 +70,7 @@ int main(int adc, char* adv[])
          
     while(1 > 0)   
     {   
+
         //clear the socket set  
         FD_ZERO(&readfds);   
      
@@ -106,7 +111,7 @@ int main(int adc, char* adv[])
             {   
                 perror("accept");   
                 exit(EXIT_FAILURE);   
-            }   
+            }
              
             //inform user of socket number - used in send and receive commands  
             printf("New connection , socket fd is %d , ip is : %s , port : %d  \n" , new_socket , inet_ntoa(address.sin_addr) , ntohs 
@@ -119,7 +124,7 @@ int main(int adc, char* adv[])
             }   
                  
             puts("Welcome message sent successfully");   
-                 
+
             //add new socket to array of sockets  
             for (i = 0; i < max_clients; i++)   
             {   
@@ -133,40 +138,42 @@ int main(int adc, char* adv[])
                 }   
             }   
         }   
-             
+
         //else its some IO operation on some other socket 
         for (i = 0; i < max_clients; i++)   
         {   
             sd = client_socket[i];   
                  
+            //read_file(buffer);
             if (FD_ISSET( sd , &readfds))   
             {   
-                //Check if it was for closing , and also read the  
-                //incoming message  
-                if ((valread = read( sd , buffer, 1024)) != 0)   
-                {   /*
-                    //Somebody disconnected , get his details and print  
-                    getpeername(sd , (struct sockaddr*)&address , 
-                        (socklen_t*)&addrlen);   
-                    printf("Host disconnected , ip %s , port %d \n" ,  
-                          inet_ntoa(address.sin_addr) , ntohs(address.sin_port));   
-                         
+                //Check if it was for closing , and also read the incoming message  
+                if ((valread = recv( sd , buffer, 1024, 0)) <= 0)   
+                {  
+                    if (valread <= 0) { 
+                        //Somebody disconnected , get his details and print  
+                        getpeername(sd , (struct sockaddr*)&address , 
+                            (socklen_t*)&addrlen);   
+                        printf("Host disconnected , ip %s , port %d \n" ,  
+                            inet_ntoa(address.sin_addr) , ntohs(address.sin_port));   
+                    }
                     //Close the socket and mark as 0 in list for reuse  
                     close( sd );   
-                    client_socket[i] = 0;   
-                    */
-                }   
-                     
+                    client_socket[i] = 0;  
+                }
                 //Echo back the message that came in  
                 else 
                 {   
                     //set the string terminating NULL byte on the end  
                     //of the data read  
                     buffer[valread] = '\0';   
-                    send(sd , buffer , strlen(buffer) , 0 );   
+                    printf("Msg recieved(%d): %s", sd, buffer);
+                    Decrypt(buffer, sd, i);
                 }   
             }   
-        }   
+        }
+
+        
     }   
          
     return 0;   

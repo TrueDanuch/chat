@@ -2,7 +2,7 @@ NAME	=	client
 
 CFLG	=	-std=c11 $(addprefix -W, all extra error pedantic) -g
 
-GTK_LIBS = -rdynamic `pkg-config --cflags --libs gtk+-3.0`
+GTK_LIBS = `pkg-config --cflags --libs gtk+-3.0`
 GTK_INC = `pkg-config --cflags gtk+-3.0`
 
 SRC_DIR	= src
@@ -18,7 +18,7 @@ all: install
 install: $(NAME)
 
 $(NAME): $(OBJ_FILES)
-	@clang $(CFLG) $(OBJ_FILES) $(GTK_LIBS) -o $@
+	@clang $(CFLG) $(OBJ_FILES) $(GTK_LIBS) -lsqlite3 -o $@
 	@printf "\r\33[2K$@ \033[32;1mcreated\033[0m\n"
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c $(INC_FILES)

@@ -26,7 +26,7 @@ void Bind(int sockfd, const struct sockaddr *addr, socklen_t addrlen) {
 
 void Listen(int sockfd, int backlog) {
     int res = listen(sockfd, backlog);
-    printf("Listening on port %d:", PORT);
+    printf("Listening on port :");
     if (res == -1) {
         perror(" failed");
         exit(EXIT_FAILURE);

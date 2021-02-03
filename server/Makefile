@@ -15,7 +15,7 @@ all: install
 install: $(NAME)
 
 $(NAME): $(OBJ_FILES)
-	@clang $(CFLG) $(OBJ_FILES) -o $@
+	@clang $(CFLG) $(OBJ_FILES) -lsqlite3 -o $@
 	@printf "\r\33[2K$@ \033[32;1mcreated\033[0m\n"
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c $(INC_FILES)
