@@ -32,9 +32,9 @@ void* Write(void* FD) {
 
 void* Read(void* FD) {
     int fd = * (int *) FD;
-    char buf[1024];
+    char buf[1100];
     while(1) {
-        if (recv(fd, buf, 1024, 0) > 0) {
+        if (recv(fd, buf, 1100, 0) > 0) {
             printf("Reag: %s\n", buf);
             Decrypt(buf, fd);
             bzero(buf, sizeof(buf));
@@ -83,7 +83,7 @@ static GtkWidget* create_window (void)
     
     wnd_main = GTK_WIDGET (gtk_builder_get_object (builder, "wnd_main"));
     dialog_auth = GTK_WIDGET(gtk_builder_get_object(builder, "dialog_auth"));
-    g_object_unref (builder);
+    //g_object_unref (builder);
     gtk_widget_hide(wnd_main);
 
     
@@ -169,12 +169,15 @@ int main(int adc, char* adv[])
     gtk_init (NULL, NULL);
     load_css();
     window = create_window ();
-    //g_signal_connect(window, "destroy", G_CALLBACK(my_delete_event), NULL);
     gtk_widget_show_all(window);
 
     DataBase();
     strncat(logname, "Andrew          ", 16);
     adc = 1;
+    sginInt = -1;
+    regInt = 0;
+    pthread_t rd;
+    pthread_t wr;
     fd = Socket(AF_INET, SOCK_STREAM, 0);
     struct sockaddr_in adr;
     adr.sin_family = AF_INET;
@@ -186,6 +189,7 @@ int main(int adc, char* adv[])
     printf("Server: %s",buf);
     pthread_create(&rd, NULL, Read, &fd);
     pthread_create(&wr, NULL, Write, &fd);
+
     gtk_main ();
     
     return 0;

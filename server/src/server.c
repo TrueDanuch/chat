@@ -132,7 +132,7 @@ int main(int adc, char* adv[])
                 if( client_socket[i] == 0 )   
                 {   
                     client_socket[i] = new_socket;   
-                    printf("Adding to list of sockets as %d\n" , i);   
+                    printf("Adding to list of sockets as %d\n\n" , i);   
                          
                     break;   
                 }   
@@ -150,16 +150,13 @@ int main(int adc, char* adv[])
                 //Check if it was for closing , and also read the incoming message  
                 if ((valread = recv( sd , buffer, 1024, 0)) <= 0)   
                 {  
-                    if (valread <= 0) { 
-                        //Somebody disconnected , get his details and print  
-                        getpeername(sd , (struct sockaddr*)&address , 
-                            (socklen_t*)&addrlen);   
-                        printf("Host disconnected , ip %s , port %d \n" ,  
-                            inet_ntoa(address.sin_addr) , ntohs(address.sin_port));   
-                    }
-                    //Close the socket and mark as 0 in list for reuse  
-                    close( sd );   
-                    client_socket[i] = 0;  
+                    
+                    //Somebody disconnected , get his details and print  
+                    getpeername(sd , (struct sockaddr*)&address , 
+                        (socklen_t*)&addrlen);   
+                    printf("Host disconnected , ip %s , port %d \n" ,  
+                        inet_ntoa(address.sin_addr) , ntohs(address.sin_port));   
+                    Quit(sd, i);
                 }
                 //Echo back the message that came in  
                 else 
@@ -167,7 +164,7 @@ int main(int adc, char* adv[])
                     //set the string terminating NULL byte on the end  
                     //of the data read  
                     buffer[valread] = '\0';   
-                    printf("Msg recieved(%d): %s", sd, buffer);
+                    printf("Msg recieved(%d): %s\n", sd, buffer);
                     Decrypt(buffer, sd, i);
                 }   
             }   

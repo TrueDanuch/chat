@@ -1,6 +1,6 @@
 #include "client.h"
 
-void MesageRecieve(char id, char chatName[32], char text[]) {
+void MesageRecieve(char id[], char chatName[32], char text[]) {
 fprintf(stdout, "STAAAAAARRRTTTTT\n");
    char *zErrMsg = 0;
    char sql[1000] = "insert into ";
@@ -8,7 +8,7 @@ fprintf(stdout, "begin strcat\n");
    strcat(sql, chatName);
    strcat(sql, " VALUES(");
    fprintf(stdout, "values\n");
-   sql[strlen(sql)] = id;
+   strncat(sql, id, 4);
    fprintf(stdout, "id\n");
    strcat(sql, ", '");
    strncat(sql, text, strlen(text));
@@ -29,8 +29,9 @@ void NewChat(char chatname[32]) {
    char *zErrMsg = 0;
    char sql[100] = "CREATE TABLE ";
 
-   strcat(sql, chatname);
+   strncat(sql, chatname, 32);
    strcat(sql, "(ID INT, mesage varchar);");
+   printf("%s\n", sql);
    rc = sqlite3_exec(db, sql, NULL, NULL, &zErrMsg);
 
    if (rc != SQLITE_OK) {

@@ -30,20 +30,29 @@ GdkDisplay *display;
 GdkScreen *screen;
 GtkBuilder *builder;
 GtkWidget *wnd_main, *dialog_auth, *window;
+GtkLabel *label_autherror_login;
 
 sqlite3 *db;
 int rc;
 pthread_t rd, wr;
 int fd;
 char logname[17];
+int sginInt;
+int regInt;
 
 //--------------------------------------------------------------------------------------------------
 //------------------------------------------   Connection ------------------------------------------
 //--------------------------------------------------------------------------------------------------
 
+//Connections
+void SGIN(char* login, char* password);
+void SGUP();
+
 //utils
 int mx_atoi(const char *str);
 bool mx_isdigit(int c);
+char* addX(char* name);
+void AddSpace(char *name);
 
 //errproc
 int Socket(int domain, int type, int protocol);
@@ -62,7 +71,7 @@ void MessageRecieveComand(char buf[]);
 void Decrypt(char buf[], int fd);
 int DataBase();
 void NewChat(char chatname[32]);
-void MesageRecieve(char id, char chatName[32], char text[]);
+void MesageRecieve(char id[5], char chatName[32], char text[]);
 
 //--------------------------------------------------------------------------------------------------
 //------------------------------------------   GUI  ------------------------------------------------
@@ -70,6 +79,7 @@ void MesageRecieve(char id, char chatName[32], char text[]);
 
 typedef struct s_groom t_groom;
 typedef struct s_chat t_chat;
+typedef struct s_signal_data t_signal_data;
 
 struct s_groom {
     GtkListBox *box_rooms;
@@ -106,8 +116,15 @@ struct s_chat {
     gboolean upl_old_msgs;
     GtkBuilder *builder;
     gboolean valid;
+    struct s_chat *chat;
     gboolean msg_placeholder;
     gboolean shift_hold;
+};
+
+struct s_signal_data {
+    t_groom *groom;
+    t_chat *chat;
+    GtkListBoxRow *row_msg;
 };
 
 void mx_widget_set_visibility(GtkWidget *widget, gboolean is_visible);
@@ -128,6 +145,5 @@ void mx_clear_buffer_text(gchar *buff_name, GtkBuilder *builder);
 //void mx_reset_addroom(GtkButton *btn, GtkBuilder *builder);
 //void mx_hide_msg_editing(GtkButton *btn, GtkBuilder *builder);
 //void mx_set_unsensetive_confirm(GtkEntryBuffer *buff, guint pos, guint n_chars, GtkEntry *entry);
-
 
 #endif

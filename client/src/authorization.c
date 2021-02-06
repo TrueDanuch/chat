@@ -1,19 +1,60 @@
 #include "client.h"
 
+gchar *mx_get_buffer_text(gchar *buff_name, GtkBuilder *builder) {
+    GObject *buffer = gtk_builder_get_object(builder, buff_name);
+    GtkTextIter start;
+    GtkTextIter end;
+    if (GTK_IS_TEXT_BUFFER(buffer)) {
+        gtk_text_buffer_get_start_iter(GTK_TEXT_BUFFER(buffer), &start);
+        gtk_text_buffer_get_end_iter(GTK_TEXT_BUFFER(buffer), &end);
+        return gtk_text_buffer_get_text(GTK_TEXT_BUFFER(buffer),
+                                        &start, &end, FALSE);
+    }
+    else
+        return (gchar*)gtk_entry_buffer_get_text(GTK_ENTRY_BUFFER(buffer));
+}
+
 void mx_close_auth(GtkButton *btn, GtkDialog *dialog) 
 {
     gtk_widget_destroy(GTK_WIDGET(dialog));
     (void)btn;
 }
 
+void LogIn() {
+    while(1) {
+        if (sginInt == 1) {
+            gtk_widget_hide(GTK_WIDGET(dialog_auth));
+            gtk_widget_show_all(GTK_WIDGET(wnd_main));
+
+            sginInt = -1;
+            break;
+        }
+        if (sginInt == 0) {
+            sginInt = -1;
+            break;
+        }
+    }
+}
+
 void mx_confirm_login(GtkButton *btn)
 {
-    gtk_widget_destroy(GTK_WIDGET(dialog_auth));
-    gtk_main_quit();
-    gtk_widget_show_all(GTK_WIDGET(wnd_main));
-    gtk_main ();
+    gchar *password = mx_get_buffer_text("buffer_password", builder);
+    gchar *Login = mx_get_buffer_text("buffer_login", builder);
+    if (strlen(Login) != 0 && strlen(password)!= 0) {
+        if (regInt == 0) {
+            SGIN(Login, password);
+            LogIn();
+        }
+        if (regInt == 1) {
+            SGUP(Login, password);
+        }
+        else
+        {
+            label_autherror_login = GTK_LABEL(gtk_builder_get_object (builder, "label_autherror_login"));
+            gtk_label_set_text(label_autherror_login, "Invalid login or password");
+        }
+    }
     (void)btn;
-    
 }
 
 void mx_show_password(GtkEntry *entry, GtkEntryIconPosition icon_pos,
@@ -33,6 +74,25 @@ void mx_show_password(GtkEntry *entry, GtkEntryIconPosition icon_pos,
     (void)event;
 }
 
+void mx_reg(GtkNotebook *notebook_auth, GtkWidget *box_signup, guint index, GtkButton *btn_auth_confirm)
+{
+    if(index == 1)
+    {
+        printf("SWITCH\n");
+        regInt = 1;
+    }
+    if(index == 0)
+    {
+        printf("HCTIWS\n");
+        regInt = 0;
+    }
+    (void)notebook_auth;
+    (void)box_signup;
+    (void)index;
+    (void)btn_auth_confirm;
+}
+
+/*
 void mx_set_sensetive_confirm(GtkEntryBuffer *buff, guint pos, gchar *chars,
                               guint n_chars, GtkEntry *entry) {
     char *buffer = (char*)gtk_entry_buffer_get_text(buff);
@@ -44,3 +104,4 @@ void mx_set_sensetive_confirm(GtkEntryBuffer *buff, guint pos, gchar *chars,
     (void)chars;
     (void)n_chars;
 }
+*/

@@ -25,6 +25,7 @@ void MessageEdit(int fd, char buf[]) {
 
 }
 */
+
 void MessageDelete(int fd, char buf[]) {
     char sender[8];
     for (int i = 4; i < 12; i++) {
@@ -39,26 +40,39 @@ void Quit(int fd) {
 }
 
 void MessageRecieveComand(char buf[]) {
-    fprintf(stdout, "START\n");
     int len = strlen(buf);
     char chatName[33];
-    char text[len - 36];
-    char msID;
-    fprintf(stdout, "created variables\n");
-    msID = buf[36];
-    printf("ID\n");
+    char text[len - 40];
+    char msID[5];
+
     for (int i = 4; i < 36; i++) {
         chatName[i - 4] = buf[i];
     }
     chatName[32] = '\0';
-    fprintf(stdout, "Chatname\n");
-    for (int i = 37; i < len-1; i++) {
-        text[i - 37] = buf[i];
+    addX(chatName);
+
+    for (int i = 36; i < 40; i++) {
+        msID[i - 36] = buf[i];
     }
-    text[len - 37] = '\0';
-    fprintf(stdout, "text: %s!!!\n", text);
+    msID[4] = '\0';
+
+    for (int i = 40; i < len-1; i++) {
+        text[i - 40] = buf[i];
+    }
+    text[len - 41] = '\0';
 
     MesageRecieve(msID, chatName, text);
+}
+
+void NewChatReciveComand(char buf[]) {
+    char chatName[33];
+    for (int i = 4; i < 36; i++) {
+        chatName[i - 4] = buf[i];
+    }
+    chatName[32] = '\0';
+    addX(chatName);
+
+    NewChat(chatName);
 
 }
 
@@ -81,6 +95,12 @@ void Decrypt(char buf[], int fd) {
     else if (!strncmp(fst_word, "msed", 4)) {
         //MessageEdit(fd, buf);
         ;
+    }else if (!strncmp(fst_word, "nwch", 4)) {
+        NewChatReciveComand(buf);
+    }else if (!strncmp(fst_word, "siny", 4)) {
+        sginInt = 1;
+    }else if (!strncmp(fst_word, "sinf", 4)) {
+        sginInt = 0;
     }
     else if (!strncmp(fst_word, "msdl", 4)) {
         MessageDelete(fd, buf);

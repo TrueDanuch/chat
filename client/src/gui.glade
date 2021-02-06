@@ -77,6 +77,7 @@
           <object class="GtkNotebook" id="notebook_auth">
             <property name="visible">True</property>
             <property name="can-focus">True</property>
+            <signal name="switch-page" handler="mx_reg" object="box_signup" swapped="no"/>
             <child>
               <object class="GtkBox" id="box_login">
                 <property name="visible">True</property>
@@ -88,7 +89,7 @@
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
                     <property name="buffer">buffer_login</property>
-                    <property name="max-length">22</property>
+                    <property name="max-length">16</property>
                     <property name="shadow-type">none</property>
                     <property name="primary-icon-pixbuf">../img/gui/log_in.png</property>
                     <property name="placeholder-text" translatable="yes">Enter your login</property>
@@ -104,7 +105,7 @@
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
                     <property name="buffer">buffer_password</property>
-                    <property name="max-length">50</property>
+                    <property name="max-length">8</property>
                     <property name="visibility">False</property>
                     <property name="invisible-char">•</property>
                     <property name="shadow-type">none</property>
@@ -169,7 +170,7 @@
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
                     <property name="buffer">buffer_login</property>
-                    <property name="max-length">22</property>
+                    <property name="max-length">16</property>
                     <property name="primary-icon-pixbuf">../img/gui/log_in.png</property>
                     <property name="placeholder-text" translatable="yes">Enter your login</property>
                   </object>
@@ -184,7 +185,7 @@
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
                     <property name="buffer">buffer_password</property>
-                    <property name="max-length">50</property>
+                    <property name="max-length">8</property>
                     <property name="visibility">False</property>
                     <property name="invisible-char">•</property>
                     <property name="primary-icon-pixbuf">../img/gui/lock.png</property>
@@ -205,7 +206,7 @@
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
                     <property name="buffer">buffer_password_confirm</property>
-                    <property name="max-length">50</property>
+                    <property name="max-length">8</property>
                     <property name="visibility">False</property>
                     <property name="invisible-char">•</property>
                     <property name="primary-icon-pixbuf">../img/gui/lock.png</property>
