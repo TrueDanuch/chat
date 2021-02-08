@@ -3,6 +3,7 @@
 <interface>
   <requires lib="gtk+" version="3.24"/>
   <object class="GtkEntryBuffer" id="buffer_login"/>
+  <object class="GtkEntryBuffer" id="buffer_members"/>
   <object class="GtkTextBuffer" id="buffer_message"/>
   <object class="GtkEntryBuffer" id="buffer_password">
     <signal name="deleted-text" handler="mx_set_unsensetive_confirm" object="entry_signup_confirm" swapped="no"/>
@@ -77,6 +78,7 @@
           <object class="GtkNotebook" id="notebook_auth">
             <property name="visible">True</property>
             <property name="can-focus">True</property>
+            <signal name="switch-page" handler="mx_reg" object="box_signup" swapped="no"/>
             <child>
               <object class="GtkBox" id="box_login">
                 <property name="visible">True</property>
@@ -88,7 +90,7 @@
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
                     <property name="buffer">buffer_login</property>
-                    <property name="max-length">22</property>
+                    <property name="max-length">16</property>
                     <property name="shadow-type">none</property>
                     <property name="primary-icon-pixbuf">../img/gui/log_in.png</property>
                     <property name="placeholder-text" translatable="yes">Enter your login</property>
@@ -104,7 +106,7 @@
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
                     <property name="buffer">buffer_password</property>
-                    <property name="max-length">50</property>
+                    <property name="max-length">8</property>
                     <property name="visibility">False</property>
                     <property name="invisible-char">•</property>
                     <property name="shadow-type">none</property>
@@ -169,7 +171,7 @@
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
                     <property name="buffer">buffer_login</property>
-                    <property name="max-length">22</property>
+                    <property name="max-length">16</property>
                     <property name="primary-icon-pixbuf">../img/gui/log_in.png</property>
                     <property name="placeholder-text" translatable="yes">Enter your login</property>
                   </object>
@@ -184,7 +186,7 @@
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
                     <property name="buffer">buffer_password</property>
-                    <property name="max-length">50</property>
+                    <property name="max-length">8</property>
                     <property name="visibility">False</property>
                     <property name="invisible-char">•</property>
                     <property name="primary-icon-pixbuf">../img/gui/lock.png</property>
@@ -205,7 +207,7 @@
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
                     <property name="buffer">buffer_password_confirm</property>
-                    <property name="max-length">50</property>
+                    <property name="max-length">8</property>
                     <property name="visibility">False</property>
                     <property name="invisible-char">•</property>
                     <property name="primary-icon-pixbuf">../img/gui/lock.png</property>
@@ -307,6 +309,11 @@
     <property name="visible">True</property>
     <property name="can-focus">False</property>
     <property name="pixbuf">../img/gui/group.png</property>
+  </object>
+  <object class="GtkImage" id="image3">
+    <property name="visible">True</property>
+    <property name="can-focus">False</property>
+    <property name="pixbuf">../img/gui/search.png</property>
   </object>
   <object class="GtkImage" id="image4">
     <property name="visible">True</property>
@@ -425,14 +432,41 @@
                 <property name="can-focus">False</property>
                 <property name="orientation">vertical</property>
                 <child>
-                  <object class="GtkSearchEntry" id="sentry_rooms">
+                  <object class="GtkBox">
                     <property name="visible">True</property>
-                    <property name="can-focus">True</property>
-                    <property name="max-length">40</property>
-                    <property name="primary-icon-pixbuf">../img/gui/search.png</property>
-                    <property name="primary-icon-activatable">False</property>
-                    <property name="primary-icon-sensitive">False</property>
-                    <property name="placeholder-text" translatable="yes">Search members</property>
+                    <property name="can-focus">False</property>
+                    <child>
+                      <object class="GtkEntry" id="entry_members">
+                        <property name="visible">True</property>
+                        <property name="can-focus">True</property>
+                        <property name="buffer">buffer_members</property>
+                        <property name="max-length">16</property>
+                        <property name="placeholder-text" translatable="yes">Search members</property>
+                      </object>
+                      <packing>
+                        <property name="expand">True</property>
+                        <property name="fill">True</property>
+                        <property name="position">0</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkButton" id="btn_find_members">
+                        <property name="width-request">30</property>
+                        <property name="height-request">30</property>
+                        <property name="visible">True</property>
+                        <property name="can-focus">True</property>
+                        <property name="receives-default">True</property>
+                        <property name="image">image3</property>
+                        <property name="image-position">right</property>
+                        <signal name="clicked" handler="mx_search_members" swapped="no"/>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="pack-type">end</property>
+                        <property name="position">1</property>
+                      </packing>
+                    </child>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -460,7 +494,7 @@
                               <object class="GtkLabel" id="label_search_delim_local">
                                 <property name="height-request">25</property>
                                 <property name="can-focus">False</property>
-                                <property name="label" translatable="yes">Search result of your members</property>
+                                <property name="label" translatable="yes">Search result of members</property>
                                 <style>
                                   <class name="label_search_result"/>
                                 </style>
@@ -501,51 +535,6 @@
                                 <property name="position">2</property>
                               </packing>
                             </child>
-                            <child>
-                              <object class="GtkLabel" id="label_search_delim_global">
-                                <property name="height-request">25</property>
-                                <property name="can-focus">False</property>
-                                <property name="label" translatable="yes">Global search result of members</property>
-                                <style>
-                                  <class name="label_search_result"/>
-                                </style>
-                              </object>
-                              <packing>
-                                <property name="expand">False</property>
-                                <property name="fill">True</property>
-                                <property name="position">3</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <object class="GtkListBox" id="listbox_global_rooms">
-                                <property name="visible">True</property>
-                                <property name="can-focus">False</property>
-                                <property name="activate-on-single-click">False</property>
-                                <style>
-                                  <class name="rooms-list"/>
-                                </style>
-                              </object>
-                              <packing>
-                                <property name="expand">False</property>
-                                <property name="fill">True</property>
-                                <property name="position">4</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <object class="GtkLabel" id="label_search_nothing_global">
-                                <property name="height-request">60</property>
-                                <property name="can-focus">False</property>
-                                <property name="label" translatable="yes">Nothing found for this request</property>
-                                <attributes>
-                                  <attribute name="foreground" value="#bababdbdb6b6"/>
-                                </attributes>
-                              </object>
-                              <packing>
-                                <property name="expand">False</property>
-                                <property name="fill">True</property>
-                                <property name="position">5</property>
-                              </packing>
-                            </child>
                           </object>
                         </child>
                       </object>
@@ -554,7 +543,7 @@
                   <packing>
                     <property name="expand">True</property>
                     <property name="fill">True</property>
-                    <property name="position">1</property>
+                    <property name="position">2</property>
                   </packing>
                 </child>
                 <child>
@@ -573,7 +562,7 @@
                   <packing>
                     <property name="expand">False</property>
                     <property name="fill">False</property>
-                    <property name="position">2</property>
+                    <property name="position">3</property>
                   </packing>
                 </child>
                 <style>
@@ -1134,7 +1123,7 @@
                 <property name="can-focus">True</property>
                 <property name="focus-on-click">False</property>
                 <property name="receives-default">True</property>
-                <signal name="clicked" handler="mx_widget_switch_visibility" object="dialog_addroom" swapped="no"/>
+                <signal name="clicked" handler="mx_add_dialog" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -1154,7 +1143,7 @@
             <property name="visible">True</property>
             <property name="can-focus">True</property>
             <property name="buffer">buffer_roomname</property>
-            <property name="max-length">20</property>
+            <property name="max-length">16</property>
             <property name="placeholder-text" translatable="yes">Member name</property>
           </object>
           <packing>

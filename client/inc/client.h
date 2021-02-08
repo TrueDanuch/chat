@@ -14,6 +14,7 @@
 #include <pthread.h>
 #include <sqlite3.h>
 #include <gtk/gtk.h>
+#include <ctype.h>
 
 
 #define MX_GUI_PATH "src/gui.glade"
@@ -30,7 +31,8 @@ GdkDisplay *display;
 GdkScreen *screen;
 GtkBuilder *builder;
 GtkWidget *wnd_main, *dialog_auth, *window;
-GtkLabel *label_autherror_login;
+GtkButton *ll;
+GtkLabel *label_autherror_login, *label_autherror_signup;
 
 sqlite3 *db;
 int rc;
@@ -46,7 +48,7 @@ int regInt;
 
 //Connections
 void SGIN(char* login, char* password);
-void SGUP();
+int SGUP();
 
 //utils
 int mx_atoi(const char *str);
@@ -142,6 +144,7 @@ void mx_show_password(GtkEntry *entry, GtkEntryIconPosition icon_pos, GdkEvent *
 void mx_entry_set_icon_by_path(GtkEntry *entry, gchar *path, GtkEntryIconPosition icon_pos);
 t_groom *mx_get_selected_groom(GtkBuilder *builder, gchar *list_name);
 void mx_clear_buffer_text(gchar *buff_name, GtkBuilder *builder);
+gchar *mx_get_buffer_text(gchar *buff_name, GtkBuilder *builder);
 //void mx_reset_addroom(GtkButton *btn, GtkBuilder *builder);
 //void mx_hide_msg_editing(GtkButton *btn, GtkBuilder *builder);
 //void mx_set_unsensetive_confirm(GtkEntryBuffer *buff, guint pos, guint n_chars, GtkEntry *entry);

@@ -25,12 +25,13 @@ void LogIn() {
         if (sginInt == 1) {
             gtk_widget_hide(GTK_WIDGET(dialog_auth));
             gtk_widget_show_all(GTK_WIDGET(wnd_main));
-
             sginInt = -1;
             break;
         }
         if (sginInt == 0) {
             sginInt = -1;
+            label_autherror_login = GTK_LABEL(gtk_builder_get_object (builder, "label_autherror_login"));
+            gtk_label_set_text(label_autherror_login, "Invalid login or password");
             break;
         }
     }
@@ -43,15 +44,32 @@ void mx_confirm_login(GtkButton *btn)
     if (strlen(Login) != 0 && strlen(password)!= 0) {
         if (regInt == 0) {
             SGIN(Login, password);
+            /*
+            GtkLabel *name = GTK_LABEL(gtk_builder_get_object(builder, "label_profile_login"));
+            char *str = g_strdup_printf (" %s", Login);
+            gtk_label_set_markup (name, str);
+            */
             LogIn();
         }
         if (regInt == 1) {
-            SGUP(Login, password);
-        }
-        else
-        {
-            label_autherror_login = GTK_LABEL(gtk_builder_get_object (builder, "label_autherror_login"));
-            gtk_label_set_text(label_autherror_login, "Invalid login or password");
+            gchar *password2 = mx_get_buffer_text("buffer_password_confirm", builder);
+            int err = SGUP(Login, password, password2);
+            printf("result:%d\n", err);
+            switch(err) {
+                case 0:
+                    label_autherror_signup = GTK_LABEL(gtk_builder_get_object (builder, "label_autherror_signup"));
+                    gtk_label_set_markup (GTK_LABEL (label_autherror_signup), "<span foreground='green'>You have successfully signed up!</span>");
+                    break;
+                case 1:
+                    label_autherror_signup = GTK_LABEL(gtk_builder_get_object (builder, "label_autherror_signup"));
+                    gtk_label_set_text(label_autherror_signup, "Passwords dont match");
+                    break;
+                case 2:
+                    label_autherror_signup = GTK_LABEL(gtk_builder_get_object (builder, "label_autherror_signup"));
+                    gtk_label_set_text(label_autherror_signup, "You can use only letters and digits in login!");
+                    break;
+            }
+
         }
     }
     (void)btn;

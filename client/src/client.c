@@ -83,7 +83,6 @@ static GtkWidget* create_window (void)
     
     wnd_main = GTK_WIDGET (gtk_builder_get_object (builder, "wnd_main"));
     dialog_auth = GTK_WIDGET(gtk_builder_get_object(builder, "dialog_auth"));
-    //g_object_unref (builder);
     gtk_widget_hide(wnd_main);
 
     
@@ -163,6 +162,12 @@ void mx_set_unsensetive_confirm(GtkEntryBuffer *buff, guint pos, guint n_chars, 
 //-------------------------------------   Main Function   ------------------------------------------
 //--------------------------------------------------------------------------------------------------
 
+gboolean *checking ()
+{
+    printf("SUCK\n");
+    return FALSE;
+}
+
 int main(int adc, char* adv[]) 
 {
 
@@ -170,6 +175,7 @@ int main(int adc, char* adv[])
     load_css();
     window = create_window ();
     gtk_widget_show_all(window);
+    g_idle_add(G_SOURCE_FUNC(checking), 0);
 
     DataBase();
     strncat(logname, "Andrew          ", 16);
