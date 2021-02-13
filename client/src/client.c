@@ -4,6 +4,27 @@
 //------------------------------------------   Connection ------------------------------------------
 //--------------------------------------------------------------------------------------------------
 
+
+
+void PreDecrypt(char buf[], int fd) {
+    char mesg[1050];
+    bzero(mesg, 1050);
+    int j = 0;
+
+    for(unsigned long i = 0; i < strlen(buf); i += 1) {
+        if ( buf[i] == '\0' || buf[i] == '\r') {
+            printf("STRING: %s\n", mesg);
+            Decrypt(mesg, fd);
+            bzero(mesg, j + 1);
+            j = 0;
+        }else {
+            mesg[j] = buf[i];
+            if (buf[i] != '')
+                j++;
+        }
+    }
+}
+
 void* Write(void* FD) {
     int fld = *(int *) FD;
     fld = 1;
@@ -34,16 +55,49 @@ void* Read(void* FD) {
     int fd = * (int *) FD;
     char buf[1100];
     while(1) {
-        if (recv(fd, buf, 1100, 0) > 0) {
-            printf("Reag: %s\n", buf);
-            Decrypt(buf, fd);
-            bzero(buf, sizeof(buf));
+        if (isconnected == 1) {
+            //printf("read\n");
+            int rcv = recv(fd, buf, 1100, 0);
+            if (rcv > 0) {
+                PreDecrypt(buf, fd);
+                bzero(buf, sizeof(buf));
+            }
+            else if (rcv == -1){
+                isconnected = 0;
+                perror("You are disconnected!\n");
+                //break;
+            }
         }
-        else {
-            printf("You are disconnected!\n");
-            break;
-        }
+        
     }
+    pthread_exit(NULL);
+}
+
+void* Connection() {
+    if (Connect(fd, (struct sockaddr *) &adr, sizeof adr) > 0) {
+        printf("CONNECTED AGAIN\n");
+        isconnected = 1;
+        sginInt = -1;
+        sgupInt = -1;
+        search_responce_int = 0;
+    }
+    while(1) {
+        if (isconnected == 0) {
+            close(fd);
+            printf("TRY TO CONNECT\n");
+            fd = socket(AF_INET, SOCK_STREAM, 0);
+
+            if (Connect(fd, (struct sockaddr *) &adr, sizeof adr) > 0) {
+                printf("CONNECTED AGAIN\n");
+                isconnected = 1;
+                sginInt = 2;
+                sgupInt = 2;
+                search_responce_int = 0;
+            }
+        }
+        sleep(1);
+    }
+    
     pthread_exit(NULL);
 }
 
@@ -83,7 +137,9 @@ static GtkWidget* create_window (void)
     
     wnd_main = GTK_WIDGET (gtk_builder_get_object (builder, "wnd_main"));
     dialog_auth = GTK_WIDGET(gtk_builder_get_object(builder, "dialog_auth"));
+    GObject *listbox = gtk_builder_get_object(builder, "listbox_rooms");
     gtk_widget_hide(wnd_main);
+    gtk_widget_hide(GTK_WIDGET(listbox));
 
     
     if (!dialog_auth)
@@ -162,11 +218,6 @@ void mx_set_unsensetive_confirm(GtkEntryBuffer *buff, guint pos, guint n_chars, 
 //-------------------------------------   Main Function   ------------------------------------------
 //--------------------------------------------------------------------------------------------------
 
-gboolean *checking ()
-{
-    printf("SUCK\n");
-    return FALSE;
-}
 
 int main(int adc, char* adv[]) 
 {
@@ -175,24 +226,36 @@ int main(int adc, char* adv[])
     load_css();
     window = create_window ();
     gtk_widget_show_all(window);
-    g_idle_add(G_SOURCE_FUNC(checking), 0);
 
     DataBase();
-    strncat(logname, "Andrew          ", 16);
+    
+    chatnumber = 0;
     adc = 1;
-    sginInt = -1;
-    regInt = 0;
+
     pthread_t rd;
     pthread_t wr;
-    fd = Socket(AF_INET, SOCK_STREAM, 0);
-    struct sockaddr_in adr;
+    pthread_t cn;
+    if ((fd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
+        perror("Socket1");
+    
+    //struct sockaddr_in adr;
+    //struct sockaddr_in adr;
     adr.sin_family = AF_INET;
     adr.sin_port = htons(atoi(adv[2]));
-    adr.sin_addr.s_addr = inet_addr(adv[1]);
+    adr.sin_addr.s_addr = inet_addr( adv[1]);
+/*
     Connect(fd, (struct sockaddr *) &adr, sizeof adr);
-    char buf[1024];
-    recv(fd, &buf, sizeof(buf), 0);
-    printf("Server: %s",buf);
+    
+    //int FD = Socket(AF_INET, SOCK_STREAM, 0);
+    //adr.sin_family = AF_INET;
+    //adr.sin_port = htons(atoi(adv[2]));
+    adr.sin_addr.s_addr = inet_addr( "10.11.3.5");
+    //fd = FD;
+    Connect(fd, (struct sockaddr *) &adr, sizeof adr);
+
+    isconnected = 1;
+    */
+    pthread_create(&cn, NULL, Connection, NULL);
     pthread_create(&rd, NULL, Read, &fd);
     pthread_create(&wr, NULL, Write, &fd);
 

@@ -20,12 +20,20 @@ void mx_close_auth(GtkButton *btn, GtkDialog *dialog)
     (void)btn;
 }
 
-void LogIn() {
+void LogIn(char* Login, char* password) {
     while(1) {
+
         if (sginInt == 1) {
             gtk_widget_hide(GTK_WIDGET(dialog_auth));
             gtk_widget_show_all(GTK_WIDGET(wnd_main));
             sginInt = -1;
+            bzero(LOGIN, 17);
+            bzero(PASSWORD, 9);
+            strncat(LOGIN, Login, 16);
+            LOGIN[16] = '\0';
+            strcat(PASSWORD, password);
+            PASSWORD[strlen(PASSWORD)] = '\0';
+            LoadChats();
             break;
         }
         if (sginInt == 0) {
@@ -34,7 +42,29 @@ void LogIn() {
             gtk_label_set_text(label_autherror_login, "Invalid login or password");
             break;
         }
+        if (sginInt == 2) {
+            sginInt = -1;
+            break;
+        }
     }
+}
+
+int SignUp() {
+    while(1) {
+        if (sgupInt == 1) {
+            sgupInt = -1;
+            return 1;
+        }
+        if (sgupInt == 0) {
+            sgupInt = -1;
+            return 0;
+        }
+        if (sgupInt == 2) {
+            sgupInt = -1;
+            return 2;
+        }
+    }
+    return 2;
 }
 
 void mx_confirm_login(GtkButton *btn)
@@ -44,21 +74,33 @@ void mx_confirm_login(GtkButton *btn)
     if (strlen(Login) != 0 && strlen(password)!= 0) {
         if (regInt == 0) {
             SGIN(Login, password);
-            /*
-            GtkLabel *name = GTK_LABEL(gtk_builder_get_object(builder, "label_profile_login"));
-            char *str = g_strdup_printf (" %s", Login);
-            gtk_label_set_markup (name, str);
-            */
-            LogIn();
+            // GtkLabel *name = GTK_LABEL(gtk_builder_get_object(builder, "label_profile_login"));
+            // char *str = g_strdup_printf ("<span>" "%s""</span>", Login);
+            // gtk_label_set_markup (name, str);
+            LogIn(Login, password);
         }
         if (regInt == 1) {
             gchar *password2 = mx_get_buffer_text("buffer_password_confirm", builder);
             int err = SGUP(Login, password, password2);
+            int sp;
+
             printf("result:%d\n", err);
             switch(err) {
                 case 0:
-                    label_autherror_signup = GTK_LABEL(gtk_builder_get_object (builder, "label_autherror_signup"));
-                    gtk_label_set_markup (GTK_LABEL (label_autherror_signup), "<span foreground='green'>You have successfully signed up!</span>");
+                    sp = SignUp();
+                    switch(sp) {
+                        case 1:
+                            label_autherror_signup = GTK_LABEL(gtk_builder_get_object (builder, "label_autherror_signup"));
+                            gtk_label_set_markup (GTK_LABEL (label_autherror_signup), "<span foreground='green'>You have successfully signed up!</span>");
+                            break;
+                        case 0:
+                            label_autherror_signup = GTK_LABEL(gtk_builder_get_object (builder, "label_autherror_signup"));
+                            gtk_label_set_text(label_autherror_signup, "User already exist!");
+                            break;
+                        case 2:
+                            break;
+                    }
+                    
                     break;
                 case 1:
                     label_autherror_signup = GTK_LABEL(gtk_builder_get_object (builder, "label_autherror_signup"));

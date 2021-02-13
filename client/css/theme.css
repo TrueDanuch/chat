@@ -277,9 +277,9 @@ dialog headerbar
 .rooms-list label 
 {
 	background-color: rgba(59, 69, 95, 0.8);
-    padding: 25px 20px;
+    padding: 15px 10px;
     border-color: transparent;
-    border-radius: 8px;
+    border-radius: 4px;
     margin: 5px 25px;
     font-size: 15px;
 }
@@ -332,23 +332,56 @@ dialog headerbar
     100% {margin-left: 25px; margin-right: 25px;}
 }
 
-.add-room-button 
-{
-	background: none;
-    padding: 10px;
-    border-radius: 100px;
-    background-color: #2c3552;
-    margin: 20px 0 25px 0;
-}
-
-.add-room-button:hover 
-{
-    background-color: rgb(47, 56, 90);
-}
-
 .wnd_main scrolledwindow overshoot, scrolledwindow undershoot 
 {
 	box-shadow: none;
+}
+
+/*--------------------------------------------------------------------------------------------------------*/
+
+.listbox-found-msgs, .stack_messages list, .listbox-found-msgs .activatable:selected 
+{
+	background: transparent;
+}
+
+.listbox-found-msgs row 
+{
+	padding: 0;
+}
+
+.listbox-found-msgs row, .listbox-found-msgs row label 
+{
+    color: #fff;
+    outline: none;
+}
+
+.listbox-found-msgs label 
+{
+	background-color: rgba(59, 69, 95, 0.8);
+    padding: 15px 10px;
+    border-color: transparent;
+    border-radius: 4px;
+    margin: 5px 15px;
+    font-size: 15px;
+}
+
+.listbox-found-msgs row:hover label 
+{
+    background-color: rgb(36, 47, 78);
+}
+
+.listbox-found-msgs row:selected label 
+{
+	background-color: rgb(55, 66, 107);
+    border-left: 3px solid rgb(73, 91, 168);
+    border-right: 3px solid rgb(73, 91, 168);
+}
+
+
+.listbox-found-msgs row .has-messages 
+{
+    border-left: 3px solid transparent;
+    border-right: 3px solid #1ce4b2;
 }
 
 /*--------------------------------------------------------------------------------------------------------*/

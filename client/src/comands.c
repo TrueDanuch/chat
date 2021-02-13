@@ -1,10 +1,18 @@
 #include "client.h"
 
-void NewChatComand(char chatname[32]) {
-    char str[37] = "nwch";
-    strcat(str, chatname);
-
-    write(fd, str, strlen(str));
+void CheckChatComand(char buf[]) {
+    char chatName[33];
+    bzero(chatName, 32);
+    printf("Buf: %s\n", buf);
+    for (int i = 4; i < 36; i++) {
+        chatName[i - 4] = buf[i];
+    }
+    chatName[32] = '\0';
+    if (CheckChat(chatName) == 1) {
+        NewChatReciveComand(buf);
+    }
+    bzero(chatName, 33);
+    
 }
 
 void SendMesage(char chatName[32], char* text) {
@@ -12,19 +20,13 @@ void SendMesage(char chatName[32], char* text) {
     bzero(mesg, 1054);
     strcat(mesg, "mesg");
     strncat(mesg, chatName, 32);
-    strcat(mesg, logname);
+    strcat(mesg, LOGIN);
     strcat(mesg, "\n");
     strncat(mesg, text, strlen(text));
-    mesg[strlen(mesg)] = '\0';
+    mesg[strlen(mesg)] = '\r';
 
     write(fd, mesg, strlen(mesg));
 }
-
-/*
-void MessageEdit(int fd, char buf[]) {
-
-}
-*/
 
 void MessageDelete(int fd, char buf[]) {
     char sender[8];
@@ -42,7 +44,7 @@ void Quit(int fd) {
 void MessageRecieveComand(char buf[]) {
     int len = strlen(buf);
     char chatName[33];
-    char text[len - 40];
+    char text[len - 39];
     char msID[5];
 
     for (int i = 4; i < 36; i++) {
@@ -56,12 +58,13 @@ void MessageRecieveComand(char buf[]) {
     }
     msID[4] = '\0';
 
-    for (int i = 40; i < len-1; i++) {
+    for (int i = 40; i < len; i++) {
         text[i - 40] = buf[i];
     }
-    text[len - 41] = '\0';
+    text[len - 40] = '\0';
 
     MesageRecieve(msID, chatName, text);
+    MessageShow(text);
 }
 
 void NewChatReciveComand(char buf[]) {
@@ -73,17 +76,16 @@ void NewChatReciveComand(char buf[]) {
     addX(chatName);
 
     NewChat(chatName);
-
 }
 
 void Decrypt(char buf[], int fd) {
-    
+
     char fst_word[4];
     for(int i = 0; i < 4; ++i) {
         fst_word[i] = buf[i];
     }
 
-    printf("First word: %s\n", fst_word);
+    printf("Comand: %s\n", fst_word);
 
     if (!strncmp(fst_word, "quit", 4))  {
         write(fd, "Disconnect\n", strlen("Disconnect\n"));
@@ -99,8 +101,20 @@ void Decrypt(char buf[], int fd) {
         NewChatReciveComand(buf);
     }else if (!strncmp(fst_word, "siny", 4)) {
         sginInt = 1;
+    }else if (!strncmp(fst_word, "supy", 4)) {
+        sgupInt = 1;
+    }else if (!strncmp(fst_word, "supf", 4)) {
+        sgupInt = 0;
     }else if (!strncmp(fst_word, "sinf", 4)) {
         sginInt = 0;
+    }else if (!strncmp(fst_word, "chch", 4)) {
+        CheckChatComand(buf);
+    }else if (!strncmp(fst_word, "sury", 4)) {
+        search_responce_int = 1;
+    }else if (!strncmp(fst_word, "surf", 4)) {
+        search_responce_int = 2;
+    }else if (!strncmp(fst_word, "udcf", 4)) {
+        update_responce_int = 1;
     }
     else if (!strncmp(fst_word, "msdl", 4)) {
         MessageDelete(fd, buf);

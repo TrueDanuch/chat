@@ -26,6 +26,12 @@
 #define MX_LOCAL_ROOMS "listbox_rooms"
 #define MX_GLOBAL_ROOMS "listbox_global_rooms"
 
+struct ChatsBase {
+    char chatName[33];
+    char username[17];
+};
+
+
 GtkCssProvider *provider;
 GdkDisplay *display;
 GdkScreen *screen;
@@ -38,9 +44,22 @@ sqlite3 *db;
 int rc;
 pthread_t rd, wr;
 int fd;
-char logname[17];
+char LOGIN[17];
+char PASSWORD[9];
+char address[9];
+int port;
 int sginInt;
+int sgupInt;
 int regInt;
+int search_responce_int;
+int update_responce_int;
+int chosen_chat_id;
+int chatnumber;
+int isconnected;
+struct sockaddr_in adr;
+
+struct ChatsBase* ChatsArray;
+
 
 //--------------------------------------------------------------------------------------------------
 //------------------------------------------   Connection ------------------------------------------
@@ -49,31 +68,44 @@ int regInt;
 //Connections
 void SGIN(char* login, char* password);
 int SGUP();
+void UPDATECHATS();
+void SEARCHUSER();
+void UPDATEMESSAGES(char chatName[32], int ID);
+void NewDialog();
+void SENDMESSAGE(char text[]);
 
 //utils
 int mx_atoi(const char *str);
 bool mx_isdigit(int c);
 char* addX(char* name);
+char* addY(char* name);
 void AddSpace(char *name);
+bool CmpLogsWithoutAddy(char log1[17], char log2[17] );
+char* addzr(int id);
+int my_strlen(const unsigned char* s);
 
 //errproc
-int Socket(int domain, int type, int protocol);
+void Socket(int domain, int type, int protocol);
 void Bind(int sockfd, const struct sockaddr *addr, socklen_t addrlen);
 void Listen(int sockfd, int backlog);
 int Accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen);
-void Connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen);
+int Connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen);
 void Inet_pton(int af, const char *src, void *dst);
 
 //Comands
 void SendMesage(char chatName[32], char* text);
-void NewChatComand(char chatname[32]);
+void NEWCHAT(char chatname[32]);
 void MessageRecieveComand(char buf[]);
+void MessageShow(char text[]);
 
 //database
 void Decrypt(char buf[], int fd);
 int DataBase();
 void NewChat(char chatname[32]);
 void MesageRecieve(char id[5], char chatName[32], char text[]);
+void NewChatReciveComand(char buf[]);
+int CheckChat();
+void CheckMessages();
 
 //--------------------------------------------------------------------------------------------------
 //------------------------------------------   GUI  ------------------------------------------------
@@ -145,6 +177,7 @@ void mx_entry_set_icon_by_path(GtkEntry *entry, gchar *path, GtkEntryIconPositio
 t_groom *mx_get_selected_groom(GtkBuilder *builder, gchar *list_name);
 void mx_clear_buffer_text(gchar *buff_name, GtkBuilder *builder);
 gchar *mx_get_buffer_text(gchar *buff_name, GtkBuilder *builder);
+void LoadChats();
 //void mx_reset_addroom(GtkButton *btn, GtkBuilder *builder);
 //void mx_hide_msg_editing(GtkButton *btn, GtkBuilder *builder);
 //void mx_set_unsensetive_confirm(GtkEntryBuffer *buff, guint pos, guint n_chars, GtkEntry *entry);

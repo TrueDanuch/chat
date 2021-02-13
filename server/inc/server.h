@@ -31,6 +31,7 @@ char *mx_itoa(int n);
 bool mx_isdigit(int c);
 char* addX(char *name);
 char* addzr(int id);
+void SendMessageToBoth(char chatName[32], char text[], int ID);
 
 //Socket
 int Socket(int domain, int type, int protocol);
@@ -49,5 +50,8 @@ bool GetUser(char name[16], char password[8]);
 void NewChat(char name1[16], char name2[16]);
 void NewMesage(char chatName[32], char text[]);
 int NewMesageID(char chatName[32]);
+void UpdateChats(char username[16], int fd);
+void UpdateMessages(char chatName[32], char id[4], int fd);
+int SearchUser(char username[16]);
 
 #endif

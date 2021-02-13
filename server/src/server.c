@@ -1,5 +1,23 @@
 #include "server.h"
      
+
+void PreDecrypt(char buf[], int fd, int I) {
+    char mesg[1050];
+    bzero(mesg, 1050);
+    int j = 0;
+
+    for(unsigned long i = 0; i < strlen(buf); i += 1) {
+        if (buf[i] == '\r' || buf[i] == '\0') {
+            Decrypt(mesg, fd, I);
+            bzero(mesg, j + 1);
+            j = 0;
+        }else {
+            mesg[j] = buf[i];
+            j++;
+        }
+    }
+}
+
 int main(int adc, char* adv[])   
 {
     DataBase();
@@ -165,7 +183,7 @@ int main(int adc, char* adv[])
                     //of the data read  
                     buffer[valread] = '\0';   
                     printf("Msg recieved(%d): %s\n", sd, buffer);
-                    Decrypt(buffer, sd, i);
+                    PreDecrypt(buffer, sd, i);
                 }   
             }   
         }
